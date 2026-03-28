@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Faculty — KCMS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root {
+    --navy: #0a1628; --navy-mid: #112240; --navy-light: #1a2f4a;
+    --gold: #c9a84c; --gold-light: #e8c97a;
+    --cream: #f5f0e8; --gray: #8892a4;
+    --border: rgba(201,168,76,0.2);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--navy); color: var(--cream); }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 4rem;
+    background: rgba(10,22,40,0.95); backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 900; color: var(--gold); text-decoration: none; }
+  .nav-logo span { color: var(--cream); }
+  .nav-links { display: flex; gap: 2rem; }
+  .nav-links a { color: var(--gray); font-size: 0.85rem; font-weight: 500; text-decoration: none; letter-spacing: 0.06em; text-transform: uppercase; transition: color 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+
+  .page-header {
+    padding: 3.5rem 4rem 2.5rem;
+    border-bottom: 1px solid var(--border);
+    background: var(--navy-mid);
+  }
+  .page-header h1 { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 900; color: var(--cream); }
+  .page-header p { color: var(--gray); margin-top: 0.5rem; font-size: 0.95rem; }
+
+  .toolbar {
+    display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;
+    padding: 1.5rem 4rem;
+    background: var(--navy-mid);
+    border-bottom: 1px solid var(--border);
+  }
+  .search-box {
+    flex: 1; min-width: 240px; max-width: 380px;
+    background: var(--navy); border: 1px solid var(--border);
+    color: var(--cream); padding: 0.6rem 1rem;
+    border-radius: 4px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+    transition: border-color 0.2s;
+  }
+  .search-box:focus { outline: none; border-color: var(--gold); }
+  .dept-filter {
+    background: var(--navy); border: 1px solid var(--border);
+    color: var(--cream); padding: 0.6rem 1rem;
+    border-radius: 4px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+    cursor: pointer;
+  }
+  .dept-filter:focus { outline: none; border-color: var(--gold); }
+  .count-badge {
+    margin-left: auto;
+    background: rgba(201,168,76,0.1); border: 1px solid var(--border);
+    color: var(--gold); padding: 0.4rem 1rem;
+    border-radius: 20px; font-size: 0.82rem; font-weight: 600;
+  }
+
+  .faculty-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 2.5rem 4rem;
+  }
+
+  .faculty-card {
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    border-radius: 10px; padding: 2rem;
+    transition: all 0.3s; position: relative; overflow: hidden;
+  }
+  .faculty-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.3s;
+  }
+  .faculty-card:hover { transform: translateY(-3px); border-color: rgba(201,168,76,0.4); }
+  .faculty-card:hover::before { transform: scaleX(1); }
+
+  .faculty-avatar {
+    width: 64px; height: 64px; border-radius: 50%;
+    background: linear-gradient(135deg, rgba(201,168,76,0.3), rgba(201,168,76,0.1));
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 700; color: var(--gold);
+    margin-bottom: 1.2rem;
+  }
+  .faculty-name { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: var(--cream); margin-bottom: 0.3rem; }
+  .faculty-title { font-size: 0.82rem; color: var(--gold); font-weight: 500; margin-bottom: 0.8rem; }
+  .faculty-dept {
+    display: inline-block;
+    background: rgba(92,168,224,0.12); color: #7ec8f0;
+    padding: 0.2rem 0.7rem; border-radius: 20px;
+    font-size: 0.75rem; font-weight: 600; margin-bottom: 1rem;
+  }
+  .faculty-info { display: flex; flex-direction: column; gap: 0.4rem; }
+  .faculty-info-item { display: flex; gap: 0.5rem; font-size: 0.83rem; color: var(--gray); align-items: flex-start; }
+  .faculty-info-item .label { color: var(--cream); font-weight: 500; min-width: 75px; }
+  .subjects-list { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
+  .subject-tag {
+    background: rgba(201,168,76,0.1); border: 1px solid rgba(201,168,76,0.2);
+    color: var(--gold); padding: 0.2rem 0.55rem;
+    border-radius: 3px; font-size: 0.72rem;
+  }
+
+  .empty-state { text-align: center; padding: 5rem 2rem; color: var(--gray); }
+  .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+  .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--cream); margin-bottom: 0.5rem; }
+  .loading { display: flex; justify-content: center; padding: 4rem; gap: 0.5rem; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); animation: bounce 1.2s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-10px)} }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .page-header, .toolbar { padding: 2rem 1.5rem; }
+    .faculty-grid { padding: 1.5rem; grid-template-columns: 1fr; }
+    .search-box { max-width: 100%; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">KCMS <span>·</span></a>
+  <div class="nav-links">
+    <a href="timetable.html">Timetable</a>
+    <a href="faculty.html" class="active">Faculty</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>Faculty Directory</h1>
+  <p>Meet the dedicated academic staff of Karnataka College of Management & Science.</p>
+</div>
+
+<div class="toolbar">
+  <input class="search-box" id="searchInput" type="text" placeholder="Search by name or subject…" oninput="filterFaculty()">
+  <select class="dept-filter" id="deptFilter" onchange="filterFaculty()">
+    <option value="">All Departments</option>
+    <option>Management</option>
+    <option>Commerce</option>
+    <option>Computer Science</option>
+    <option>Tourism</option>
+    <option>Finance</option>
+    <option>Marketing</option>
+    <option>HR</option>
+  </select>
+  <div class="count-badge" id="countBadge">— Faculty</div>
+</div>
+
+<div class="faculty-grid" id="facultyGrid">
+  <div style="grid-column:1/-1">
+    <div class="loading"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://uotxrxixyyqgzyjnasgx.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_fDdMxOswlp94txp5TssRlA_Oas-_d2H';
+
+const { createClient } = supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let allFaculty = [];
+
+function getInitials(name) {
+  return name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+}
+
+async function loadFaculty() {
+  try {
+    const { data, error } = await sb.from('faculty').select('*').order('name');
+    if (error) throw error;
+    allFaculty = data || [];
+    filterFaculty();
+  } catch {
+    allFaculty = getDemoFaculty();
+    filterFaculty();
+  }
+}
+
+function getDemoFaculty() {
+  return [
+    { id:1, name:'Dr. Ramesh Kumar', title:'Professor', department:'Management', email:'ramesh@kcms.edu', phone:'+91 98765 43210', subjects:['Management Principles','Strategic Management'], courses:'MBA, PGDM' },
+    { id:2, name:'Prof. Sunita Rao', title:'Associate Professor', department:'Finance', email:'sunita@kcms.edu', phone:'+91 98765 43211', subjects:['Business Statistics','Quantitative Methods'], courses:'MBA, BBA' },
+    { id:3, name:'Dr. Venkat Sharma', title:'Professor', department:'Commerce', email:'venkat@kcms.edu', phone:'+91 98765 43212', subjects:['Financial Accounting','Cost Accounting'], courses:'BCOM, MCOM' },
+    { id:4, name:'Dr. Priya Mehta', title:'Assistant Professor', department:'HR', email:'priya@kcms.edu', phone:'+91 98765 43213', subjects:['Organizational Behavior','HRM'], courses:'MBA, BBA' },
+    { id:5, name:'Prof. Anil Verma', title:'Associate Professor', department:'Management', email:'anil@kcms.edu', phone:'+91 98765 43214', subjects:['Introduction to Management','Business Communication'], courses:'BBA' },
+    { id:6, name:'Dr. Kavitha Nair', title:'Professor', department:'Finance', email:'kavitha@kcms.edu', phone:'+91 98765 43215', subjects:['Business Mathematics','Operations Research'], courses:'BBA, BCA' },
+    { id:7, name:'Prof. Suresh Babu', title:'Associate Professor', department:'Computer Science', email:'suresh@kcms.edu', phone:'+91 98765 43216', subjects:['Data Structures','Algorithms','DBMS'], courses:'BCA' },
+    { id:8, name:'Dr. Meera S', title:'Assistant Professor', department:'Computer Science', email:'meera@kcms.edu', phone:'+91 98765 43217', subjects:['Operating Systems','Computer Networks'], courses:'BCA' },
+    { id:9, name:'Prof. Rajan T', title:'Associate Professor', department:'Commerce', email:'rajan@kcms.edu', phone:'+91 98765 43218', subjects:['Corporate Accounting','Auditing'], courses:'BCOM, MCOM' },
+    { id:10, name:'Dr. Deepa Srinivas', title:'Professor', department:'Marketing', email:'deepa@kcms.edu', phone:'+91 98765 43219', subjects:['Marketing Management','Consumer Behaviour'], courses:'MBA, PGDM' },
+    { id:11, name:'Mr. Anand Pillai', title:'Lecturer', department:'Tourism', email:'anand@kcms.edu', phone:'+91 98765 43220', subjects:['Tourism Geography','Travel Operations'], courses:'BTTM, MTMT' },
+    { id:12, name:'Dr. Anita Joshi', title:'Associate Professor', department:'Commerce', email:'anita@kcms.edu', phone:'+91 98765 43221', subjects:['Advanced Accounting','Financial Management'], courses:'MCOM, MBA' },
+  ];
+}
+
+function filterFaculty() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const dept = document.getElementById('deptFilter').value;
+
+  const filtered = allFaculty.filter(f => {
+    if (dept && f.department !== dept) return false;
+    if (q) {
+      const hay = `${f.name} ${(f.subjects || []).join(' ')} ${f.department}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  document.getElementById('countBadge').textContent = `${filtered.length} Faculty`;
+  renderFaculty(filtered);
+}
+
+function renderFaculty(data) {
+  const grid = document.getElementById('facultyGrid');
+  if (!data.length) {
+    grid.innerHTML = `<div style="grid-column:1/-1"><div class="empty-state"><div class="empty-icon">👤</div><h3>No faculty found</h3><p>Try adjusting your search or department filter.</p></div></div>`;
+    return;
+  }
+  grid.innerHTML = data.map(f => {
+    const subjects = Array.isArray(f.subjects) ? f.subjects : (f.subjects ? f.subjects.split(',') : []);
+    return `
+    <div class="faculty-card">
+      <div class="faculty-avatar">${getInitials(f.name)}</div>
+      <div class="faculty-name">${f.name}</div>
+      <div class="faculty-title">${f.title || 'Faculty'}</div>
+      <div class="faculty-dept">${f.department || '—'}</div>
+      <div class="faculty-info">
+        ${f.email ? `<div class="faculty-info-item"><span class="label">Email</span><span>${f.email}</span></div>` : ''}
+        ${f.phone ? `<div class="faculty-info-item"><span class="label">Phone</span><span>${f.phone}</span></div>` : ''}
+        ${f.courses ? `<div class="faculty-info-item"><span class="label">Courses</span><span>${f.courses}</span></div>` : ''}
+      </div>
+      ${subjects.length ? `<div class="subjects-list">${subjects.map(s => `<span class="subject-tag">${s.trim()}</span>`).join('')}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+loadFaculty();
+</script>
+</body>
+</html>

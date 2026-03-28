@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KCMS — Karnataka College of Management & Science</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #112240;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --cream: #f5f0e8;
+    --white: #ffffff;
+    --gray: #8892a4;
+    --border: rgba(201,168,76,0.2);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--navy);
+    color: var(--cream);
+    overflow-x: hidden;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 4rem;
+    background: rgba(10,22,40,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 900;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--cream); }
+  .nav-links { display: flex; gap: 2.5rem; align-items: center; }
+  .nav-links a {
+    color: var(--gray); font-size: 0.88rem; font-weight: 500;
+    text-decoration: none; letter-spacing: 0.08em; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--gold); }
+  .nav-links .btn-admin {
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 0.5rem 1.2rem;
+    border-radius: 3px;
+    transition: all 0.2s;
+  }
+  .nav-links .btn-admin:hover { background: var(--gold); color: var(--navy); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 8rem 4rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 60% at 70% 50%, rgba(201,168,76,0.08) 0%, transparent 70%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(201,168,76,0.04) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(201,168,76,0.04) 1px, transparent 1px);
+    background-size: 80px 80px;
+  }
+  .hero-content { position: relative; z-index: 1; max-width: 700px; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    border: 1px solid var(--border);
+    padding: 0.4rem 1rem; border-radius: 50px;
+    font-size: 0.78rem; font-weight: 500; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--gold); margin-bottom: 2rem;
+  }
+  .hero-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-weight: 900; line-height: 1.05;
+    color: var(--cream);
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 em { color: var(--gold); font-style: normal; }
+  .hero p {
+    font-size: 1.1rem; color: var(--gray); line-height: 1.8;
+    max-width: 520px; margin-bottom: 3rem;
+  }
+  .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--gold);
+    color: var(--navy);
+    padding: 0.9rem 2.2rem;
+    border-radius: 4px;
+    font-weight: 600; font-size: 0.9rem;
+    text-decoration: none; letter-spacing: 0.05em;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+  .btn-primary:hover { background: var(--gold-light); transform: translateY(-1px); }
+  .btn-secondary {
+    border: 1px solid rgba(245,240,232,0.3);
+    color: var(--cream);
+    padding: 0.9rem 2.2rem;
+    border-radius: 4px;
+    font-weight: 500; font-size: 0.9rem;
+    text-decoration: none; letter-spacing: 0.05em;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+  .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+  .hero-visual {
+    position: absolute; right: 4rem; top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.15;
+    font-family: 'Playfair Display', serif;
+    font-size: 18vw; font-weight: 900;
+    color: var(--gold); line-height: 1;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* STATS */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .stat {
+    padding: 2.5rem 3rem;
+    border-right: 1px solid var(--border);
+    text-align: center;
+  }
+  .stat:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.8rem; font-weight: 900;
+    color: var(--gold); display: block;
+  }
+  .stat-label { font-size: 0.82rem; color: var(--gray); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 0.3rem; }
+
+  /* COURSES */
+  .section { padding: 6rem 4rem; }
+  .section-header { margin-bottom: 3.5rem; }
+  .section-tag {
+    display: inline-block;
+    font-size: 0.75rem; font-weight: 600;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 1rem;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 700; color: var(--cream);
+    line-height: 1.2;
+  }
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  .course-card {
+    background: var(--navy-mid);
+    border: 1px solid var(--border);
+    border-radius: 8px; padding: 2rem;
+    transition: all 0.3s; cursor: pointer;
+    text-decoration: none; display: block;
+    position: relative; overflow: hidden;
+  }
+  .course-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gold), var(--gold-light));
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 0.3s;
+  }
+  .course-card:hover { border-color: var(--gold); transform: translateY(-4px); }
+  .course-card:hover::before { transform: scaleX(1); }
+  .course-abbr {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem; font-weight: 900;
+    color: var(--gold); margin-bottom: 0.5rem;
+  }
+  .course-name { font-size: 0.95rem; color: var(--cream); font-weight: 500; margin-bottom: 0.8rem; }
+  .course-meta { font-size: 0.8rem; color: var(--gray); }
+  .course-meta span { background: rgba(201,168,76,0.1); padding: 0.25rem 0.6rem; border-radius: 20px; }
+
+  /* FEATURES */
+  .features-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem;
+  }
+  .feature {
+    padding: 2.5rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--navy-mid);
+  }
+  .feature-icon {
+    width: 48px; height: 48px; border-radius: 8px;
+    background: rgba(201,168,76,0.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; margin-bottom: 1.5rem;
+    border: 1px solid var(--border);
+  }
+  .feature h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--cream); margin-bottom: 0.8rem; }
+  .feature p { color: var(--gray); font-size: 0.9rem; line-height: 1.7; }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 4rem;
+    display: flex; align-items: center; justify-content: space-between;
+    color: var(--gray); font-size: 0.85rem;
+  }
+  footer a { color: var(--gold); text-decoration: none; }
+
+  @media (max-width: 768px) {
+    nav { padding: 1rem 1.5rem; }
+    .hero { padding: 7rem 1.5rem 3rem; }
+    .hero-visual { display: none; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .section { padding: 4rem 1.5rem; }
+    .features-grid { grid-template-columns: 1fr; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+    .nav-links { gap: 1rem; }
+    .nav-links a:not(.btn-admin) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">KCMS <span>·</span></a>
+  <div class="nav-links">
+    <a href="timetable.html">Timetable</a>
+    <a href="faculty.html">Faculty</a>
+    <a href="login.html" class="btn-admin">Admin Portal</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">Academic Year 2024–2025</div>
+    <h1>Karnataka College of<br><em>Management</em><br>& Science</h1>
+    <p>Manage and access class schedules, faculty information, and course timetables for all programs — MBA, BBA, BCA, BTTM, MCOM, and more.</p>
+    <div class="hero-cta">
+      <a href="timetable.html" class="btn-primary">View Timetable</a>
+      <a href="faculty.html" class="btn-secondary">Meet the Faculty</a>
+    </div>
+  </div>
+  <div class="hero-visual">K</div>
+</section>
+
+<div class="stats">
+  <div class="stat">
+    <span class="stat-num">8</span>
+    <div class="stat-label">Programs Offered</div>
+  </div>
+  <div class="stat">
+    <span class="stat-num">120+</span>
+    <div class="stat-label">Faculty Members</div>
+  </div>
+  <div class="stat">
+    <span class="stat-num">3,000+</span>
+    <div class="stat-label">Students Enrolled</div>
+  </div>
+  <div class="stat">
+    <span class="stat-num">25+</span>
+    <div class="stat-label">Years of Excellence</div>
+  </div>
+</div>
+
+<section class="section">
+  <div class="section-header">
+    <div class="section-tag">Programs</div>
+    <div class="section-title">Our Courses</div>
+  </div>
+  <div class="courses-grid">
+    <a href="timetable.html?course=MBA" class="course-card">
+      <div class="course-abbr">MBA</div>
+      <div class="course-name">Master of Business Administration</div>
+      <div class="course-meta"><span>2 Years · 4 Semesters</span></div>
+    </a>
+    <a href="timetable.html?course=PGDM" class="course-card">
+      <div class="course-abbr">PGDM</div>
+      <div class="course-name">Post Graduate Diploma in Management</div>
+      <div class="course-meta"><span>2 Years · 4 Semesters</span></div>
+    </a>
+    <a href="timetable.html?course=BBA" class="course-card">
+      <div class="course-abbr">BBA</div>
+      <div class="course-name">Bachelor of Business Administration</div>
+      <div class="course-meta"><span>3 Years · 6 Semesters</span></div>
+    </a>
+    <a href="timetable.html?course=BTTM" class="course-card">
+      <div class="course-abbr">BTTM</div>
+      <div class="course-name">Bachelor of Travel & Tourism Management</div>
+      <div class="course-meta"><span>3 Years · 6 Semesters</span></div>
+    </a>
+    <a href="timetable.html?course=MTMT" class="course-card">
+      <div class="course-abbr">MTMT</div>
+      <div class="course-name">Master of Travel & Tourism Management</div>
+      <div class="course-meta"><span>2 Years · 4 Semesters</span></div>
+    </a>
+    <a href="timetable.html?course=BCA" class="course-card">
+      <div class="course-abbr">BCA</div>
+      <div class="course-name">Bachelor of Computer Applications</div>
+      <div class="course-meta"><span>3 Years · 6 Semesters</span></div>
+    </a>
+    <a href="timetable.html?course=BCOM" class="course-card">
+      <div class="course-abbr">B.Com</div>
+      <div class="course-name">Bachelor of Commerce</div>
+      <div class="course-meta"><span>3 Years · 6 Semesters</span></div>
+    </a>
+    <a href="timetable.html?course=MCOM" class="course-card">
+      <div class="course-abbr">M.Com</div>
+      <div class="course-name">Master of Commerce</div>
+      <div class="course-meta"><span>2 Years · 4 Semesters</span></div>
+    </a>
+  </div>
+</section>
+
+<section class="section" style="background: var(--navy-mid); border-top: 1px solid var(--border);">
+  <div class="section-header">
+    <div class="section-tag">Features</div>
+    <div class="section-title">Smart Scheduling System</div>
+  </div>
+  <div class="features-grid">
+    <div class="feature">
+      <div class="feature-icon">📅</div>
+      <h3>Live Timetable</h3>
+      <p>Access real-time class schedules filtered by course, semester, and day. Always up to date.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">👥</div>
+      <h3>Faculty Directory</h3>
+      <p>Browse all faculty members, their departments, and assigned subjects at a glance.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">⚡</div>
+      <h3>Conflict Detection</h3>
+      <p>Admin tools automatically detect scheduling conflicts before they're published.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🔒</div>
+      <h3>Secure Admin Portal</h3>
+      <p>Role-based access ensures only authorized staff can add, edit, or delete entries.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">📱</div>
+      <h3>Mobile Friendly</h3>
+      <p>Fully responsive design for students on any device — phone, tablet, or desktop.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🎓</div>
+      <h3>Multi-Program Support</h3>
+      <p>Handles all 8 programs with independent semester and section management.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>© 2025 Karnataka College of Management & Science. All rights reserved.</div>
+  <div>
+    <a href="timetable.html">Timetable</a> ·
+    <a href="faculty.html" style="margin-left: 0.5rem;">Faculty</a> ·
+    <a href="login.html" style="margin-left: 0.5rem;">Admin</a>
+  </div>
+</footer>
+
+</body>
+</html>
